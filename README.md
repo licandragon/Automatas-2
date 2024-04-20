@@ -1,86 +1,42 @@
-# Proyecto Automatas 2
-Link: [Link a este design doc](#)
-
+# Proyecto Automatas 2: Bot de refaccionaria
 Autor: Justino Daniel Guerrero Rivera
 
-Status: [Draft, Ready for review, In Review, Reviewed]
+Estado: Borrador
 
-Ultima actualización: YYYY-MM-DD
+Ultima actualización: 2024-04-20
 
 ## Contenido
-- Goals
-- Non-Goals
-- Background
-- Overview
-- Detailed Design
-  - Solucion 1
-    - Frontend
-    - Backend
-  - Solucion 2
-    - Frontend
-    - Backend
-- Consideraciones
-- Métricas
+- Objetivo
+- Metas
+- Metas no prioritarias
+- Trnsfondo
+- Descripcion a Alto Nivel
+- Detalles de Diseño
 
-## Links
-- [Un link](#)
-- [Otro link](#)
 
 ## Objetivo
-_Que y porque estamos haciendo esto?_
+Se pretende crear un bot de Telegram que ayuden en la cotiazacion de la refacción que requiera el cliente sin la necesidad de ir directamente a refaccionaria, se limitara el alcance a solo refacciones para tractocamiones de la marca Kenworth, en futuro se podria amplear a otras marcas.
 
-_Incluye contexto para las personas que no están familiarizadas con el proyecto._
 
-_Mantenlo corto, elabora en **Background, Overview y Detailed Design**_
+### Metas
+- Diseño e implemtacion de bot
+  - se crearan varios comandos que ayuden para la busqueda especificas
+    - ofrecer opciones a elegir en caso de contar con mas de un resultados.
+  - Boton par ver promociones
+- Diseñar la base de datos
+  - Se
+## Metas no prioritarias
+- Interaccion con inteligencia artificial (IA) y reconocimiento de piezas por imgenes
+- Compras dentro del bot, dependiendo de lo avanzado del proyecto se va a considerar integrar las compras de momento solo es consulta e interaccion con el bot.
 
-_Añade screenshots / mocks si lo ves necesario_
 
-## Goals
-- Goals
-## Non-Goals
-- Non-Goals
+## Descripcion General a Alto Nivel
+El bot se realizara en Python con la liberia para telegram **[python-telegram-bot](https://python-telegram-bot.org/)**, para poder implementar el bot es requierido crearlo desde el bot de telegram **[@botFather](https://telegram.me/BotFather)** y contar con la llave secreta para poder programar al bot.
 
-## Background
-_Cuál es el contexto de este proyecto?_
+Sera necesario crear una base de datos donde donde estara alamcenada la informacion las refacciones y promociones.
+ 
+## Detalles del Diseño
+_**1. Interfaz de Usuario**: bot de telegram con el que el usuario va a interactuar, contara con botones para comandos y navegacion entre resultados_
 
-_Incluye recursos, como otros design docs si es necesario_
-
-_No escribas acerca de tu diseño o requerimientos aquí_
-
-## Overview
-_Overview a alto nivel de tu propuesta_
-
-_Esta sección debería ser entendible por nuevos miembros de tu equipo que no están relacionados al proyecto_
-
-_Pon detalles en la siguiente sección_
-
-## Detailed Design
-_Usa diagramas donde veas necesario_
-
-_Herramientas como [Excalidraw](https://excalidraw.com) son buenos recursos para esto_
-
-_Cubre los cambios principales:_
-
- _- Cuales son las nuevas funciones que vas a escribir?_
- _- Porque necesitas nuevos componentes?_
- _- Hay código que puede ser reusable?_
-
-_No elabores minuciosamente la implementación._
-
-## Solution 1
-### Frontend
-_Frontend…_
-### Backend
-_Backend…_
-
-## Solution 2
-### Frontend
-_Frontend…_
-### Backend
-_Backend…_
-
-## Consideraciones
-_Preocupaciones / trade-offs / tech debt_
-
-## Métricas
-_Que información necesitas para validar antes de lanzar este feature?_
+_**2. Base de datos**: donde se consultara la informacion que se vera reflejada en _
+## Disclaimer
