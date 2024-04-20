@@ -1,0 +1,21 @@
+{
+  "sin_resultados":[
+    "¡Lo siento, no he encontrado nada que coincida con tu búsqueda!",
+    "Parece que lo que estás buscando no está en mi base de datos en este momento.",
+    "¡Vaya! No tengo información sobre eso. ¿Te gustaría probar con una búsqueda diferente?",
+    "Hmmm, no puedo encontrar nada relevante para tu consulta. ¿Te gustaría que intentara con algo más?",
+    ""
+  ],
+  "despedidas": [
+    "¡Hasta pronto! Fue un placer ayudarte.",
+    "¡Nos vemos en la próxima! Espero que hayas encontrado lo que buscabas.",
+    "¡Adiós! Si necesitas algo más, no dudes en contactarme.",
+    "¡Hasta luego! Que tengas un buen día.",
+    "¡Nos vemos! Espero que te haya gustado usar mi servicio.",
+    "¡Chao! Si tienes alguna otra pregunta, no dudes en preguntar.",
+    "¡Hasta la próxima aventura! Me alegra haberte podido ayudar.",
+    "¡Encantado de haberte servido! ¡Hasta la próxima!",
+    "¡Te deseo lo mejor! Si necesitas algo más, ya sabes dónde encontrarme.",
+    "¡Nos vemos en el futuro! Espero que sigas disfrutando de mi servicio."
+  ]
+}
