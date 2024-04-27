@@ -1,0 +1,17 @@
+{
+  "commands": [
+    {
+      "command": "iniciar",
+      "description": "Iniciar el bot, ok"
+    },
+    {
+      "command": "ayuda",
+      "description": "asdasd"
+    },
+    {
+      "command": "menu",
+      "description": "menu de comandos disponibles"
+    }
+  ],
+  "language_code": "en"
+}
