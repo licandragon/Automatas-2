@@ -1,5 +1,7 @@
+-- version usada base de datos: 10.4.32-MariaDB
 drop database if exists `refacciones_bot`;
-create database `refacciones_bot`;
+create database `refacciones_bot` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+use `refacciones_bot`;
 
 create table usuarios(
     usuario_id int auto_increment,
