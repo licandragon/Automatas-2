@@ -5,7 +5,7 @@ use `refacciones_bot`;
 
 create table usuarios(
     usuario_id int auto_increment,
-    uid_telegram varchar(255),
+    uid_telegram BIGINT,
     primary key (usuario_id)
 );
 
@@ -31,7 +31,7 @@ create table camiones(
     camion_id int auto_increment,
     marca_id int not null,
     modelo varchar(255) not null,
-    año tinyint(4),
+    año INT,
     primary key (camion_id),
     foreign key (marca_id) references marcas(marca_id)
 );
@@ -62,6 +62,7 @@ create table camiones_refacciones(
     foreign key (refaccion_id) references refacciones(refaccion_id)
 );
 
+
 INSERT INTO `categorias` (`nombre`)
 VALUES
 ('Baterías y cargadores'),
@@ -84,9 +85,10 @@ VALUES
 ('Accesorios de montaje y piezas de repuesto'),
 ('Sistemas híbridos');
 
+
 INSERT INTO `marcas` (`nombre`)  VALUES ('Kenhwort');
 
-
+INSERT INTO `provedoores` (nombre) VALUES  ('TRP');
 
 
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','540','2000');
@@ -330,6 +332,7 @@ INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T440','2017');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T440','2018');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T440','2019');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T440','2020');
+INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T440','2021');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T450','1996');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T450','1995');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T450','1988');
@@ -3854,3 +3857,38 @@ INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T800','2010');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T800','2011');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T800','2014');
 INSERT INTO `camiones` (`marca_id`,`modelo`,`Año`) VALUES ('1','T800','2012');
+
+INSERT INTO `refacciones` (nombre, numero_parte, provedor_id, categoria_id, descripcion, especificaciones, imagen,activo, stock, precio)
+VALUES ('TAMBOR DE FRENOS 15X4 DELANTERO TRP','DB154B', '1','4','TAMBOR DE FRENOS 15X4 DELANTERO TRP',
+    '{"Unidad de medida": "Cada elemento",
+        "Código VMRS": "013-001-023 [Tambor freno delantero]",
+        "Tornillo Circular": "11.25",
+        "Tamaño Hoyo de Tornillo": "1.28",
+        "Orificios de Tornillos": "10",
+        "Medida de Frenos": "15 x 4",
+        "Diámetro de Guía": "8.78",
+        "Tamaño": "15",
+        "Se usa con": "Hub Pilot – Front Steer",
+        "Peso (lb)": "70",
+        "Tipo de Rueda": "Disco"
+    }', 'https://mex.trpparts.com/es/refacciones/acoples/tambor/db154b?Id=3765b598-5780-4ec8-9bef-f9521d7b65d9#', true, 50, 1500.45);
+INSERT INTO `refacciones` (nombre, numero_parte, provedor_id, categoria_id, descripcion, especificaciones, imagen,activo, stock, precio)
+VALUES ('Faro BEAM-SEALED 4537 13V 100W',' LB4537', '1','2','luces de bulbo sellado! Estos productos de alta calidad son producidos por un proveedor confiable de equipo original en iluminación automotriz y ahora están disponibles través de su proveedor local: Misma calidad, servicio y entrega.',
+    '{"Unidad de medida": "Cada elemento",
+      "Código VMRS": "013-001-023 [Tambor freno delantero]",
+      "Caracteristicas y Beneficios" : "Reflejo reducido para uso legal en la carretera Cumple los estándares de puntos del Departamento de Transporte (DOT) específicos del producto  las normas SAE específicas del producto"
+    }', 'https://trp-assets.anthology-digital.com/assets/LB4537_P01_FRO_ALL-HIGH.png', true, 50, 1500.45);
+INSERT INTO `refacciones` (nombre, numero_parte, provedor_id, categoria_id, descripcion, especificaciones, imagen,activo, stock, precio)
+VALUES ('INTERRUPTOR-LUZ DIRECCIONAL','TL10750', '1','2','luces de bulbo sellado! Estos productos de alta calidad son producidos por un proveedor confiable de equipo original en iluminación automotriz y ahora están disponibles través de su proveedor local: Misma calidad, servicio y entrega.',
+    '{"Description": "INTERRUPTOR-LUZ DIRECCIONAL",
+        "Unidad de medida": "Cada elemento",
+        "Código VMRS": "034-003-016 [Interruptor:  funcionamiento de la señal de viraje]",
+        "Reemplaza": "Peterbilt: 16-06432",
+        "Tipo": "11 Cables"}'
+    , 'https://trp-assets.anthology-digital.com/assets/TL10750_P01_FRO_ALL-HIGH.png', true, 15, 200);
+
+INSERT INTO `camiones_refacciones` VALUES (38, 1);
+INSERT INTO `camiones_refacciones` VALUES (241, 1);
+INSERT INTO `camiones_refacciones` VALUES (300, 3);
+INSERT INTO `camiones_refacciones` VALUES (304, 3);
+

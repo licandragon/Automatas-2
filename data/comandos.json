@@ -2,15 +2,19 @@
   "commands": [
     {
       "command": "iniciar",
-      "description": "Iniciar el bot, ok"
+      "description": "Puedes ver un mensaje de bienvenida"
+    },
+    {
+      "command": "iniciar",
+      "description": "Puedes empezar una busqueda"
     },
     {
       "command": "ayuda",
-      "description": ""
+      "description": "Puedes ver la lista de comandos disponibles"
     },
     {
-      "command": "menu",
-      "description": "menu de comandos disponibles"
+      "command": "configurar",
+      "description": "Puedes establecer direccion de envio (Pendiente)"
     }
   ],
   "language_code": "en"
