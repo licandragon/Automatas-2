@@ -1,25 +1,46 @@
 {
-  "commands": [
+   "en": [
     {
-      "command": "iniciar",
-      "description": "Puedes ver un mensaje de bienvenida"
+      "command": "start",
+      "description": "Start the bot"
     },
     {
+      "command": "search",
+      "description": "You can start a search"
+    },
+    {
+      "command": "help",
+      "description": "You can see the list of available commands"
+    },
+    {
+      "command": "setting",
+      "description": "You can set custom settings for the user"
+    },
+    {
+      "command": "cancel",
+      "description": "The command in progress is canceled"
+    }
+  ],
+  "es": [
+    {
       "command": "iniciar",
-      "description": "Puedes empezar una busqueda"
+      "description": "Iniciar el bot"
+    },
+    {
+      "command": "buscar",
+      "description": "Puedes empezar una búsqueda"
     },
     {
       "command": "ayuda",
       "description": "Puedes ver la lista de comandos disponibles"
     },
     {
-      "command": "configurar",
-      "description": "Puedes establecer direccion de envio (Pendiente)"
+      "command": "configuracion",
+      "description": "Puedes establecer configuraciones personalizadas para el usuario"
     },
     {
       "command": "cancel",
       "description": "Se cancela el comando en curso"
     }
-  ],
-  "language_code": "en"
+  ]
 }
