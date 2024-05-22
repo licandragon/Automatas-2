@@ -15,6 +15,10 @@
     {
       "command": "configurar",
       "description": "Puedes establecer direccion de envio (Pendiente)"
+    },
+    {
+      "command": "cancel",
+      "description": "Se cancela el comando en curso"
     }
   ],
   "language_code": "en"
