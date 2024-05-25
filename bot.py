@@ -1,7 +1,6 @@
 import json
 import logging
 import random
-import re
 from typing import Final
 
 import mysql.connector
@@ -11,6 +10,10 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Appli
     MessageHandler, filters, CallbackQueryHandler
 
 TOKEN: Final = "6968150664:AAE1bXxljBYm5-bZHArAX3k_fAJf1ZtNwtE"
+
+TIMEOUT: Final = 20
+
+ROW: Final = 5
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -27,7 +30,7 @@ with open('data/comandos.json', encoding='utf-8') as file:
     comandos = json.load(file)
 
 SEARCH_CHOSE, SEARCH_NORMAL, SEARCH_ADVANCED, SEARCH_TRUCK, SEARCH_MODEL, SEARCH_PART, SEARCH_DETAILS, \
-    SEARCH_CONFIRM, DISPLAY_RESULTS, SHOW_DETAILS = range(10)
+    SEARCH_QUERY, DISPLAY_RESULTS, SHOW_DETAILS = range(10)
 
 
 def get_db_connection():
@@ -77,6 +80,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 query = """INSERT INTO usuarios (uid_telegram) VALUES (%s)"""
                 cursor.execute(query, (uuid,))
                 connection.commit()
+                await update.message.reply_text(
+                    f'Hola bienvenido, ¿En qué puedo ayudarte {update.effective_user.first_name}?')
+            else:
+                await update.message.reply_text(random.choice(respuestas["bienvenidas"]))
         except mysql.connector.Error as err:
             logger.error(f"Error al ejecutar la consulta en la base de datos: {err}")
         finally:
@@ -87,6 +94,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 #Funcion
 async def chose_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("El usuario esta seleccionando un tipo de busqueda")
     if update.message.text == "Normal":
         await update.message.reply_text(
             "Dime qué deseas buscar o si tienes el *número de parte* proporcionamelo para hacer una búsqueda en mi "
@@ -137,6 +145,7 @@ async def chose_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f'El usuario {update.effective_user.id} a comenzado una busqueda normal')
     search_term = update.message.text.lower()
     connection = get_db_connection()
     if connection:
@@ -144,38 +153,35 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cursor = connection.cursor()
             query = """
                    SELECT 
-                       r.refaccion_id,
-                       r.nombre AS nombre_refaccion,
-                       r.numero_parte,
-                       p.nombre AS nombre_proveedor,
-                       c.nombre AS nombre_categoria,
-                       r.descripcion,
-                       r.especificaciones,
-                       r.imagen,
-                       r.activo,
-                       r.stock,
-                       r.precio 
-                   FROM 
-                       refacciones r
-                   INNER JOIN 
-                       provedores p ON r.provedor_id = p.proveedor_id
-                   INNER JOIN 
-                       categorias c ON r.categoria_id = c.categoria_id
+                        r.refaccion_id,
+                        r.nombre AS refaccion_nombre,
+                        r.numero_parte AS 'numero_parte',
+                        r.precio,
+                        r.imagen,
+                        GROUP_CONCAT(m.nombre,' ',ca.modelo, '(', ca.año,')') AS camiones_compatibles
+                    FROM
+                        refacciones r
+                        JOIN provedores p ON r.provedor_id = p.proveedor_id
+                        JOIN categorias c ON r.categoria_id = c.categoria_id
+                        LEFT JOIN camiones_refacciones cr ON r.refaccion_id = cr.refaccion_id
+                        LEFT JOIN camiones ca ON cr.camion_id = ca.camion_id
+                        LEFT JOIN marcas m ON ca.marca_id = m.marca_id
                    WHERE 
-                       r.nombre LIKE %s OR r.numero_parte = %s;
+                       r.nombre LIKE %s OR r.numero_parte = %s
+                    GROUP BY r.refaccion_id;
                """
             cursor.execute(query, ('%' + search_term + '%', search_term))
             results = cursor.fetchall()
             connection.close()
 
             if results:
-                response = "He encontrado las siguientes refacciones:\n\n"
-                for refaccion in results:
-                    response += (f"Nombre: {refaccion[1]}\nNúmero de parte: {refaccion[2]}\nProveedor: {refaccion[3]}\n"
-                                 f"Categoría: {refaccion[4]}\nDescripción: {refaccion[5]}\nEspecificaciones: "
-                                 f"{refaccion[6]}\n"
-                                 f"Precio: ${refaccion[10]}\nStock: {refaccion[9]}\n\n")
-                await update.message.reply_text(response)
+                #Se mustra una mensaje con una lista de los resultados y con un InlineKeyboardMarkup se maneja la
+                # paginacion en caso de ser mas de 5 elementos y el usuario va a seleccionar el que elemento quiere ver sus detalles
+                context.user_data['search_results'] = results
+                context.user_data['current_page'] = 0
+                context.user_data["msg_id"] = None
+                await display_results(update, context)
+                return DISPLAY_RESULTS
             else:
                 await update.message.reply_text(random.choice(respuestas["sin_resultados"]))
         except mysql.connector.Error as err:
@@ -186,10 +192,8 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-#SELECT r.refaccion_id, r.nombre AS nombre_refaccion, r.numero_parte, p.nombre ASnombre_proveedor, c.nombre AS
-# nombre_categoria,r.descripcion, r.especificaciones,r.imagen, r.activo,r.stock, r.precio FROM refacciones r INNER JOIN
-# provedores p ON r.proveedor_id = p.proveedor_id INNER JOIN categorias c ON r.categoria_id = c.categoria_id where ;""
-
+#Modo de Busqueda Avanzada permite tener un mejor control sobre la busqueda tratando de garantizar que existran
+# resuktados
 async def search_advanced(update: Update, context: ContextTypes.DEFAULT_TYPE):
     search_state = context.user_data["search_state"]
     if search_state == SEARCH_MODEL:
@@ -204,21 +208,22 @@ async def search_advanced(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("¿Que refaccion estas buscando?")
         context.user_data["search_state"] = SEARCH_PART
         return SEARCH_PART
-    if search_state == SEARCH_PART:
+    elif search_state == SEARCH_PART:
         context.user_data["parte"] = update.message.text
-        await update.message.reply_text(
-            f'Estas buscando {update.message.text}, estas buscando con alguna caracteristica'
-            f' en especifico? Si no es asi solo escribe No, para ir mostrarte los resultados')
-        if update.message.text.lower() == "no":
-            context.user_data["detalles"] = None
-            return SEARCH_CONFIRM
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=
+        f'Estas buscando *{update.message.text}*, estas buscando con alguna caracteristica'
+        f' en especifico? \nEscribe No, saltarte esta opcion', parse_mode='MarkdownV2')
         context.user_data["search_state"] = SEARCH_DETAILS
         return SEARCH_DETAILS
-    if search_state == SEARCH_DETAILS:
-        context.user_data["detalles"] = update.message.text.split(' ')
+    elif search_state == SEARCH_DETAILS:
+        if update.message.text.lower() == "no":
+            context.user_data["detalles"] = None
+        else:
+            context.user_data["detalles"] = update.message.text.split(' ')
         print(context.user_data)
-        return ConversationHandler.END
+        return SEARCH_QUERY
     return ConversationHandler.END
+
 
 #Se selecciona que marca de camion va a requerir la refaccion
 async def chose_truck(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -230,9 +235,152 @@ async def chose_truck(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(marcas)
     context.user_data['marca_id'] = marca_id
     await query.edit_message_text(text=f"Marca seleccionada: {marcas[marca_id]}\nAhora, proporciona el *modelo* y *año "
-                                       f"\('opcional\)*\.", parse_mode='MarkdownV2')
+                                       f"\(opcional\)*\.", parse_mode='MarkdownV2')
     context.user_data["search_state"] = SEARCH_MODEL
     return SEARCH_MODEL
+
+
+#Aqui se contruye el query de la busqueda
+async def search_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("Si entro en la funcion")
+    marca_id = context.user_data.get('marca_id')
+    modelo = context.user_data.get('modelo')
+    año = context.user_data.get('año')
+    parte = context.user_data.get('parte')
+    detalles = context.user_data.get('detalles')
+    query = """
+                  SELECT
+                        r.refaccion_id,
+                        r.nombre AS refaccion_nombre,
+                        r.numero_parte AS 'numero_parte',
+                        r.precio,
+                        r.imagen,
+                        GROUP_CONCAT(m.nombre,' ',ca.modelo, '(', ca.año,')') AS camiones_compatibles
+                    FROM
+                        refacciones r
+                        JOIN categorias c ON r.categoria_id = c.categoria_id
+                        LEFT JOIN camiones_refacciones cr ON r.refaccion_id = cr.refaccion_id
+                        LEFT JOIN camiones ca ON cr.camion_id = ca.camion_id
+                        LEFT JOIN marcas m ON ca.marca_id = m.marca_id
+                        WHERE r.activo = true
+               """
+    conditions = []
+    params = []
+
+    if marca_id:
+        conditions.append("m.marca_id = %s")
+        params.append(marca_id)
+
+    if modelo:
+        conditions.append("ca.modelo LIKE %s")
+        params.append('%' + modelo + '%')
+
+    if año:
+        conditions.append("ca.año = %s")
+        params.append(año)
+
+    if parte:
+        conditions.append("(r.nombre LIKE %s OR r.numero_parte = %s)")
+        params.append('%' + parte + '%')
+        params.append(parte)
+
+    if detalles:
+        for detalle in detalles:
+            conditions.append("(r.descripcion LIKE %s OR JSON_CONTAINS(r.especificaciones, %s))")
+            params.append('%' + detalle + '%')
+            params.append(json.dumps(detalle))
+
+    if conditions:
+        query += " AND " + " AND ".join(conditions)
+
+    query += " GROUP BY r.refaccion_id"
+    print(f'Este es el query: {query}')
+    print(f'Estos son los parametros: {params}')
+    connection = get_db_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query, tuple(params))
+            results = cursor.fetchall()
+            connection.close()
+
+            if results:
+                context.user_data['search_results'] = results
+                print(results)
+                context.user_data['current_page'] = 0
+                context.user_data["msg_id"] = None
+                await display_results(update, context)
+                return DISPLAY_RESULTS
+            else:
+                await update.message.reply_text(random.choice(respuestas["sin_resultados"]))
+        except mysql.connector.Error as err:
+            logger.error(f"Error al ejecutar la consulta en la base de datos: {err}")
+            await update.message.reply_text("Ocurrió un error al realizar la consulta. Inténtalo más tarde.")
+    else:
+        await update.message.reply_text("Ocurrió un error al conectar a la base de datos. Inténtalo más tarde.")
+
+    return ConversationHandler.END
+
+
+async def display_results(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    results = context.user_data['search_results']
+    page = context.user_data['current_page']
+
+    start_index = page * ROW
+    end_index = start_index + ROW
+    page_results = results[start_index:end_index]
+
+    response = f'<i>Resultados de la búsqueda:</i>\n'
+    n = 0
+    for i, result in enumerate(page_results, start=start_index + 1):
+        response += f"[<b>{i}</b>]. <b>{result[1]}</b>(Número de parte: {result[2]}, Precio: ${result[3]}\)\n"
+        n += 1
+
+    buttons = []
+    for i in range(n):
+        buttons.append(InlineKeyboardButton(f'{i + 1}', callback_data=f'detail_{i}'))
+    controls = []
+    if start_index > 0:
+        controls.append(InlineKeyboardButton('◀️', callback_data='previous'))
+    controls.append(InlineKeyboardButton('❌', callback_data='cancel'))
+    if end_index < len(results):
+        controls.append(InlineKeyboardButton('▶️', callback_data='next'))
+
+    reply_markup = InlineKeyboardMarkup([buttons, controls])
+    if context.user_data["msg_id"] is None:
+        await update.message.reply_text(response, reply_markup=reply_markup, parse_mode='html')
+    else:
+        await update.callback_query.edit_message_text(text=response, reply_markup=reply_markup, parse_mode='html')
+
+
+async def handle_callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == 'previous':
+        context.user_data['current_page'] -= 1
+        context.user_data["msg_id"] = query.message.message_id
+        await display_results(update, context)
+    elif query.data == 'next':
+        context.user_data['current_page'] += 1
+        context.user_data["msg_id"] = query.message.message_id
+        await display_results(update, context)
+    elif query.data == 'cancel':
+        await query.delete_message()
+        return ConversationHandler.END
+    elif query.data.startswith('detail_'):
+        index = int(query.data.split('_')[1])
+        print(index)
+        result = context.user_data['search_results'][index]
+        print(result)
+        response = (f"Detalles del resultado:\n"
+                    f"Nombre: {result[1]}\n"
+                    f"Número de parte: {result[2]}\n"
+                    f"Precio: ${result[3]}\n"
+                    f"Camiones compatibles: {result[5]}\n")
+        await query.delete_message()
+        await context.bot.send_photo(chat_id=update.effective_chat.id, photo=result[4], caption=response)
+        return ConversationHandler.END
 
 
 async def promotion(update: Update, context: ContextTypes) -> None:
@@ -259,8 +407,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def timeout(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("se ejecuto timeout")
     await update.message.reply_text(random.choice(respuestas["inactivity_messages"]),
                                     reply_markup=ReplyKeyboardRemove())
+    context.user_data.clear()
     return ConversationHandler.END
 
 
@@ -277,14 +427,16 @@ def main() -> None:
             SEARCH_MODEL: [MessageHandler(filters.TEXT & ~filters.COMMAND, search_advanced)],
             SEARCH_PART: [MessageHandler(filters.TEXT & ~filters.COMMAND, search_advanced)],
             SEARCH_DETAILS: [MessageHandler(filters.TEXT & ~filters.COMMAND, search_advanced)],
+            SEARCH_QUERY: [MessageHandler(filters.TEXT & ~filters.COMMAND, search_query)],
+            SHOW_DETAILS: [CallbackQueryHandler(display_results, pattern='^back$')],
+            DISPLAY_RESULTS: [CallbackQueryHandler(handle_callback_query)],
             ConversationHandler.TIMEOUT: [MessageHandler(filters.TEXT | filters.COMMAND, timeout)],
-
         },
         fallbacks=[CommandHandler('cancel', cancel)],
         per_message=False,
         per_user=True,
-        # Manejar el timeout con la función cancel_timeout
-        conversation_timeout=20
+        # Se establece el tiempo de inactividad si es superado finaliza la conversacion
+        conversation_timeout=TIMEOUT
     )
 
     app.add_handler(search_handler)

@@ -1,4 +1,9 @@
 {
+  "bienvenidas": [
+    "¡Hola! Bienvenido a nuestro bot de consulta de refacciones. ¿En qué puedo ayudarte hoy?",
+    "¡Bienvenido! Estoy aquí para ayudarte a encontrar las refacciones que necesitas. ¿Qué buscas?",
+    "¡Saludos! ¿Cómo puedo asistirte en la búsqueda de refacciones para tu camión?"
+  ],
   "sin_resultados":[
     "¡Lo siento, no he encontrado nada que coincida con tu búsqueda!",
     "Parece que lo que estás buscando no está en mi base de datos en este momento.",

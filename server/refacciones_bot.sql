@@ -44,7 +44,7 @@ create table refacciones(
     categoria_id int not null ,
     descripcion text,
     especificaciones json,
-    imagen varchar(255) default 'https://www.shutterstock.com/image-vector/no-image-available-sign-internet-600nw-261719003.jpg',
+    imagen varchar(255) default 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
     activo boolean default true,
     stock int,
     precio double,
@@ -694,7 +694,7 @@ VALUES ('TAMBOR DE FRENOS 15X4 DELANTERO TRP','DB154B', '1','4','TAMBOR DE FRENO
         "Se usa con": "Hub Pilot – Front Steer",
         "Peso (lb)": "70",
         "Tipo de Rueda": "Disco"
-    }', 'https://mex.trpparts.com/es/refacciones/acoples/tambor/db154b?Id=3765b598-5780-4ec8-9bef-f9521d7b65d9#', true, 50, 1500.45);
+    }', 'https://trp-assets.anthology-digital.com/assets/DB154B_P01_FRO_ALL-HIGH.png', true, 50, 1500.45);
 INSERT INTO `refacciones` (nombre, numero_parte, provedor_id, categoria_id, descripcion, especificaciones, imagen,activo, stock, precio)
 VALUES ('Faro BEAM-SEALED 4537 13V 100W',' LB4537', '1','2','luces de bulbo sellado! Estos productos de alta calidad son producidos por un proveedor confiable de equipo original en iluminación automotriz y ahora están disponibles través de su proveedor local: Misma calidad, servicio y entrega.',
     '{"Unidad de medida": "Cada elemento",
@@ -735,7 +735,12 @@ INSERT INTO `refacciones` (nombre, numero_parte, provedor_id, categoria_id, desc
 ('Tensor de correa para camión Scania R Series', 'R-Series-Belt-Tensioner', '3', '7', 'Tensor de correa de repuesto para camiones Scania R Series', '{"Compatibilidad": "Camiones Scania R Series", "Material": "Acero reforzado", "Durabilidad": "Resistencia a la corrosión"}',  true, 25, 149.99),
 ('Espejo retrovisor para camión Kenworth T680', 'T680-Rearview-Mirror', '4', '11', 'Espejo retrovisor de repuesto para camiones Kenworth T680', '{"Compatibilidad": "Camiones Kenworth T680", "Tipo": "Espejo convexo", "Ajuste": "Eléctrico"}', true, 15, 89.99),
 ('Amortiguador delantero para camión Freightliner Cascadia', 'Cascadia-Front-Shock', '5', '12', 'Amortiguador delantero de repuesto para camiones Freightliner Cascadia', '{"Compatibilidad": "Camiones Freightliner Cascadia", "Tipo": "Amortiguador de gas", "Diseño": "Monotubo"}',  true, 22, 99.99),
-('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99);
+('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99),
+('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump1', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99),
+('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump2', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99),
+('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump3', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99),
+('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump4', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99),
+('Bomba de agua para camión International Prostar', 'Prostar-Water-Pump5', '1', '6', 'Bomba de agua de repuesto para camiones International Prostar', '{"Compatibilidad": "Camiones International Prostar", "Tipo": "Bomba de agua centrífuga", "Flujo máximo": "50 GPM"}',  true, 18, 149.99);
 
 INSERT INTO `camiones_refacciones` VALUES (38, 1);
 INSERT INTO `camiones_refacciones` VALUES (241, 1);
@@ -766,5 +771,11 @@ INSERT INTO `camiones_refacciones` (camion_id, refaccion_id) VALUES
 (21, 22),
 (22, 23),
 (23, 24),
-(24, 25);
+(24, 25),
+(1,27),
+(1,28),
+(1,29),
+(1,30),
+(1,31),
+(1,32);
 
