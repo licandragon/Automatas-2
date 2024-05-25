@@ -31,11 +31,13 @@ Se pretende crear un bot de Telegram que ayuden en la cotiazacion de la refacciÃ
 
 ## Dependencias y sus versiones
 _Para este proyecto se utilizo los siguientes:_
-- Python 3.10.11
-  - python-telegram-bot V21.2
+- **Python 3.10.11**
+  - python-telegram-bot V21.2, dependencia adicional ***"python-telegram-bot[job-queue]"***
   - mysql-connector-python
--MariaDB 10.4.32 en servidor Apache
-  - 
+  >pip install -r requeriment.txt
+
+-MariaDB 10.4.32 en servidor Apache o XAMPP 8.2.12 / PHP 8.2.12
+  
 ## Descripcion General a Alto Nivel
 El bot se realizara en Python con la liberia para telegram **[python-telegram-bot](https://python-telegram-bot.org/)**, para poder implementar el bot es requierido crearlo desde el bot de telegram **[@botFather](https://telegram.me/BotFather)** y contar con la llave secreta para poder programar al bot.
 

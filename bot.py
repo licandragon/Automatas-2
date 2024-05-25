@@ -47,8 +47,8 @@ def get_db_connection():
 async def post_init(application: Application) -> None:
     for language in comandos:
         bot_commands = [BotCommand(cmd['command'], cmd['description']) for cmd in comandos[language]]
-        print(bot_commands)
-        print(language)
+        #print(bot_commands)
+        #print(language)
         await application.bot.set_my_commands(bot_commands, scope=None, language_code=language)
 
 
