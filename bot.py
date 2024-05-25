@@ -8,7 +8,7 @@ import mysql.connector
 from telegram import Update, BotCommand, KeyboardButton, ReplyKeyboardMarkup, \
     ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Application, ConversationHandler, \
-    MessageHandler, filters, CallbackQueryHandler, CallbackContext
+    MessageHandler, filters, CallbackQueryHandler
 
 TOKEN: Final = "6968150664:AAE1bXxljBYm5-bZHArAX3k_fAJf1ZtNwtE"
 
