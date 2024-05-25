@@ -33,6 +33,7 @@ SEARCH_CHOSE, SEARCH_NORMAL, SEARCH_ADVANCED, SEARCH_TRUCK, SEARCH_MODEL, SEARCH
     SEARCH_QUERY, DISPLAY_RESULTS, SHOW_DETAILS = range(10)
 
 
+#Funcion para obtener la conexion a la base de datos
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
@@ -47,6 +48,7 @@ def get_db_connection():
         return None
 
 
+#Se establecen la lista de comandos
 async def post_init(application: Application) -> None:
     for language in comandos:
         bot_commands = [BotCommand(cmd['command'], cmd['description']) for cmd in comandos[language]]
@@ -55,17 +57,7 @@ async def post_init(application: Application) -> None:
         await application.bot.set_my_commands(bot_commands, scope=None, language_code=language)
 
 
-async def init_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    type_search = ReplyKeyboardMarkup([
-        [KeyboardButton('Normal')], [KeyboardButton('Avanzado')]
-    ], input_field_placeholder='Elige una tipo de busqueda')
-    await update.message.reply_text(
-        f'¿Que tipo de busqueda vas a realizar?', reply_markup=type_search
-    )
-    context.user_data["search_state"] = SEARCH_CHOSE
-    return SEARCH_CHOSE
-
-
+#Funcion para el comando /inicio o /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     uuid = update.effective_user.id
 
@@ -92,7 +84,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hola bienvenido, ¿En qué puedo ayudarte {update.effective_user.first_name}?')
 
 
-#Funcion
+#Se inicia el comando de busqueda donde se elige el modo
+async def init_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    type_search = ReplyKeyboardMarkup([
+        [KeyboardButton('Normal')], [KeyboardButton('Avanzado')]
+    ], input_field_placeholder='Elige una tipo de busqueda')
+    await update.message.reply_text(
+        f'¿Que tipo de busqueda vas a realizar?', reply_markup=type_search
+    )
+    context.user_data["search_state"] = SEARCH_CHOSE
+    return SEARCH_CHOSE
+
+
+#Callback para la seleccion la busqueda
 async def chose_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info("El usuario esta seleccionando un tipo de busqueda")
     if update.message.text == "Normal":
@@ -144,6 +148,7 @@ async def chose_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
 
 
+#Funcion para la busqueda normal
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f'El usuario {update.effective_user.id} a comenzado una busqueda normal')
     search_term = update.message.text.lower()
@@ -192,8 +197,8 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-#Modo de Busqueda Avanzada permite tener un mejor control sobre la busqueda tratando de garantizar que existran
-# resuktados
+#Funcion de Busqueda Avanzada permite tener un mejor control sobre la busqueda tratando de garantizar que existran
+# resultados
 async def search_advanced(update: Update, context: ContextTypes.DEFAULT_TYPE):
     search_state = context.user_data["search_state"]
     if search_state == SEARCH_MODEL:
@@ -322,6 +327,7 @@ async def search_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
+#Callback para mostrar los resultado en pantalla con InelineKeyboardButton para la paginacion
 async def display_results(update: Update, context: ContextTypes.DEFAULT_TYPE):
     results = context.user_data['search_results']
     page = context.user_data['current_page']
@@ -353,6 +359,7 @@ async def display_results(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.callback_query.edit_message_text(text=response, reply_markup=reply_markup, parse_mode='html')
 
 
+#Funcion que gestiona los callback_data de la funcion display_result
 async def handle_callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -383,14 +390,17 @@ async def handle_callback_query(update: Update, context: ContextTypes.DEFAULT_TY
         return ConversationHandler.END
 
 
+#Pendiente de desarrollo
 async def promotion(update: Update, context: ContextTypes) -> None:
     await update.message.reply_text(f'Hola {update.effective_user.first_name}')
 
 
+#pendiente de desarrollo
 async def config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Hola {update.effective_user.first_name}')
 
 
+#Pendiente de desarrollo, Aqui se pretende obordar dudas al respecto de los comandos
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(await context.bot.get_my_commands())
     message = (f'Hola En que puedo ayudarte {update.effective_user.first_name} '
@@ -398,6 +408,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(message)
 
 
+#Funcion que sirve para detener otros comandos
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user
     logger.info(f'El usuario {user.first_name} ha cancelado la conversacion')
@@ -406,6 +417,8 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 
+#Funcion se dispara cuando se acaba el tiempo de espera, hay un ligero error y no se dispara dentro de los
+# CallbackQueryHandler se deben de manejar con JobQueue
 async def timeout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("se ejecuto timeout")
     await update.message.reply_text(random.choice(respuestas["inactivity_messages"]),
@@ -414,6 +427,7 @@ async def timeout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
+#Funcion Main donde se inicializa el bot
 def main() -> None:
     app = ApplicationBuilder().token(TOKEN).post_init(post_init).build()
     app.add_handler(CommandHandler(['iniciar', 'start'], start))
