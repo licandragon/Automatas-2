@@ -16,5 +16,12 @@
     "¡Encantado de haberte servido! ¡Hasta la próxima!",
     "¡Te deseo lo mejor! Si necesitas algo más, ya sabes dónde encontrarme.",
     "¡Nos vemos en el futuro! Espero que sigas disfrutando de mi servicio."
-  ]
+  ],
+  "inactivity_messages": [
+        "La conversación ha sido cancelada debido a la inactividad. Si necesitas ayuda, por favor, comienza de nuevo.",
+        "Parece que no has respondido en un rato. La conversación ha sido finalizada. ¡Vuelve cuando estés listo!",
+        "Hemos terminado la conversación debido a la falta de respuesta. No dudes en volver si necesitas más asistencia.",
+        "La sesión ha expirado por inactividad. Si necesitas más ayuda, inicia una nueva conversación.",
+        "Hemos cancelado la conversación ya que no hubo respuesta. Por favor, comienza de nuevo si necesitas ayuda."
+    ]
 }
